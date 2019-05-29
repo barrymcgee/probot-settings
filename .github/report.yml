@@ -1,0 +1,61 @@
+# Local times at which the bot will send automatic reports
+reportTimes:
+  - 09:00
+  - 12:30
+# Timezone offset for all users where the timezone cannot be inferred
+# Defaults to PDT (UTC-07:00)
+defaultTimezone: -420
+# Maximum number of days to report new issues
+newIssueDays: 7
+# Ignores all issues that match this regular expression in their title
+ignoreRegex: "\\bwip\\b"
+# Ignores all issues with these lables
+ignoreLabels:
+  - duplicate
+  - wontfix
+  - invalid
+# Mailer configuration, can be omitted to disable email
+email:
+  # Name of the email sender
+  sender: '"🤖 Eos - Github Bot" <noreply@md.getsentry.com>'
+  # E-Mail subject
+  subject: "Github needs your attention"
+  # Template for the entire email body
+  bodyTemplate: >
+    Hi <%- user.name %>,
+    <%= toReview %>
+    <%= toComplete %>
+    <%= newIssues %>
+  # Template to render a single issue
+  issueTemplate: >
+    <% _.forEach(issues, function (issue) { %>
+      <li>
+          <b><a href="<%= issue.html_url %>">
+            <%- issue.repository_url.match('[^/]+/[^/]+$')[0] %>#<%- issue.number %>
+          </a></b>:
+          <%- issue.title %><br />
+          <small>
+            opened <%- moment(issue.created_at).fromNow() %>,
+            updated <%- moment(issue.updated_at).fromNow() %>
+            by <a href="<%= issue.user.html_url %>"><%- issue.user.login %></a>
+          </small>
+      </li>
+    <% }) %>
+  # Template to format the section of PRs to review
+  toReviewTemplate: >
+    <p>These pull requests need to be <b>reviewed</b>:</p>
+    <ul>
+      <%= issues %>
+    </ul>
+  # Template to format the section of PRs to complete
+  toCompleteTemplate: >
+    <p>These pull requests need to be <b>handled</b>:</p>
+    <ul>
+      <%= issues %>
+    </ul>
+  # Template to format the section of new issues
+  newIssuesTemplate: >
+    <p>There are issues you could <b>label and assign</b>:</p>
+    <ul>
+      <%= issues %>
+    </ul>
